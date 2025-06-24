@@ -78,83 +78,104 @@ export const GET_ACTIVE_PUBLICATIONS = gql`
   }
 `;
 
-// Order Queries (updated for gsPublications)
+// Order Queries (using gsContracts backend)
 export const GET_ORDERS = gql`
-  query GetOrders {
-    orders {
-      id
-      userId
-      user {
+  query GetOrders($limit: Int, $offset: Int) {
+    orders(limit: $limit, offset: $offset) {
+      OrderId
+      PubID
+      DateAdded
+      Net
+      RepIDs
+      Description
+      publication {
+        gsPublicationID
+        PubName
+        PubAbbrev
+        IssueSet
+        SubProductTypeId
+        isActive
+      }
+      representatives {
         gsEmployeesId
         FirstName
         LastName
         Email
-      }
-      total
-      status
-      createdAt
-      publications {
-        id
-        publicationId
-        publication {
-          gsPublicationID
-          PubName
-          PubAbbrev
-        }
-        quantity
-        price
       }
     }
   }
 `;
 
 export const GET_ORDER = gql`
-  query GetOrder($id: Int!) {
-    order(id: $id) {
-      id
-      userId
-      user {
+  query GetOrder($OrderId: Int!) {
+    order(OrderId: $OrderId) {
+      OrderId
+      PubID
+      DateAdded
+      Net
+      RepIDs
+      Description
+      publication {
+        gsPublicationID
+        PubName
+        PubAbbrev
+        IssueSet
+        SubProductTypeId
+        isActive
+      }
+      representatives {
         gsEmployeesId
         FirstName
         LastName
         Email
       }
-      total
-      status
-      createdAt
-      publications {
-        id
-        publicationId
-        publication {
-          gsPublicationID
-          PubName
-          PubAbbrev
-        }
-        quantity
-        price
+    }
+  }
+`;
+
+export const GET_ORDERS_BY_PUBLICATION = gql`
+  query GetOrdersByPublication($PubID: Int!) {
+    ordersByPublication(PubID: $PubID) {
+      OrderId
+      PubID
+      DateAdded
+      Net
+      RepIDs
+      Description
+      publication {
+        gsPublicationID
+        PubName
+        PubAbbrev
+      }
+      representatives {
+        gsEmployeesId
+        FirstName
+        LastName
+        Email
       }
     }
   }
 `;
 
-export const GET_ORDERS_BY_USER = gql`
-  query GetOrdersByUser($userId: Int!) {
-    ordersByUser(userId: $userId) {
-      id
-      userId
-      total
-      status
-      createdAt
-      publications {
-        id
-        publicationId
-        publication {
-          gsPublicationID
-          PubName
-          PubAbbrev
-        }
-        quantity
-        price
+export const GET_ORDERS_BY_REPRESENTATIVE = gql`
+  query GetOrdersByRepresentative($RepID: Int!) {
+    ordersByRepresentative(RepID: $RepID) {
+      OrderId
+      PubID
+      DateAdded
+      Net
+      RepIDs
+      Description
+      publication {
+        gsPublicationID
+        PubName
+        PubAbbrev
+      }
+      representatives {
+        gsEmployeesId
+        FirstName
+        LastName
+        Email
       }
     }
   }
@@ -234,35 +255,55 @@ export const TOGGLE_PUBLICATION_STATUS = gql`
   }
 `;
 
-// Order Mutations (updated for gsPublications)
+// Order Mutations (using gsContracts backend)
 export const CREATE_ORDER = gql`
   mutation CreateOrder($input: CreateOrderInput!) {
     createOrder(input: $input) {
-      id
-      userId
-      user {
+      OrderId
+      PubID
+      DateAdded
+      Net
+      RepIDs
+      Description
+      publication {
+        gsPublicationID
+        PubName
+        PubAbbrev
+      }
+      representatives {
         gsEmployeesId
         FirstName
         LastName
       }
-      total
-      status
-      createdAt
     }
   }
 `;
 
-export const UPDATE_ORDER_STATUS = gql`
-  mutation UpdateOrderStatus($id: Int!, $status: String!) {
-    updateOrderStatus(id: $id, status: $status) {
-      id
-      status
+export const UPDATE_ORDER = gql`
+  mutation UpdateOrder($OrderId: Int!, $input: UpdateOrderInput!) {
+    updateOrder(OrderId: $OrderId, input: $input) {
+      OrderId
+      PubID
+      DateAdded
+      Net
+      RepIDs
+      Description
+      publication {
+        gsPublicationID
+        PubName
+        PubAbbrev
+      }
+      representatives {
+        gsEmployeesId
+        FirstName
+        LastName
+      }
     }
   }
 `;
 
 export const DELETE_ORDER = gql`
-  mutation DeleteOrder($id: Int!) {
-    deleteOrder(id: $id)
+  mutation DeleteOrder($OrderId: Int!) {
+    deleteOrder(OrderId: $OrderId)
   }
 `; 

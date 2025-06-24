@@ -50,36 +50,31 @@ const typeDefs = gql`
     isActive: Boolean
   }
 
-  # Order Type
+  # Order Type (UI display name for gsContracts)
   type Order {
-    id: Int
-    userId: Int
-    total: Float
-    status: String
-    createdAt: String
-    user: gsEmployees
-    publications: [OrderItem]
-  }
-
-  # OrderItem Type (references gsPublications)
-  type OrderItem {
-    id: Int
-    orderId: Int
-    publicationId: Int
-    quantity: Int
-    price: Float
+    OrderId: Int
+    PubID: Int
+    DateAdded: String
+    Net: Float
+    RepIDs: String
+    Description: String
     publication: gsPublications
+    representatives: [gsEmployees]
   }
 
-  # Input Types for Orders
+  # Input Types for Orders (gsContracts)
   input CreateOrderInput {
-    userId: Int!
-    publications: [OrderPublicationInput!]!
+    PubID: Int!
+    Net: Float!
+    RepIDs: String!
+    Description: String
   }
 
-  input OrderPublicationInput {
-    publicationId: Int!
-    quantity: Int!
+  input UpdateOrderInput {
+    PubID: Int
+    Net: Float
+    RepIDs: String
+    Description: String
   }
 
   # Queries
@@ -94,10 +89,11 @@ const typeDefs = gql`
     gsPublicationsByType(SubProductTypeId: Int!): [gsPublications]
     activeGsPublications: [gsPublications]
 
-    # Order Queries
-    orders: [Order]
-    order(id: Int!): Order
-    ordersByUser(userId: Int!): [Order]
+    # Order Queries (gsContracts backend)
+    orders(limit: Int = 100, offset: Int = 0): [Order]
+    order(OrderId: Int!): Order
+    ordersByPublication(PubID: Int!, limit: Int = 100): [Order]
+    ordersByRepresentative(RepID: Int!, limit: Int = 100): [Order]
   }
 
   # Mutations
@@ -113,10 +109,10 @@ const typeDefs = gql`
     deleteGsPublication(gsPublicationID: Int!): Boolean
     toggleGsPublicationStatus(gsPublicationID: Int!): gsPublications
 
-    # Order Mutations
+    # Order Mutations (gsContracts backend)
     createOrder(input: CreateOrderInput!): Order
-    updateOrderStatus(id: Int!, status: String!): Order
-    deleteOrder(id: Int!): Boolean
+    updateOrder(OrderId: Int!, input: UpdateOrderInput!): Order
+    deleteOrder(OrderId: Int!): Boolean
   }
 
   type Subscription {

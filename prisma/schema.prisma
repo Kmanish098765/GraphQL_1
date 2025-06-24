@@ -31,3 +31,14 @@ model gsPublications {
 
   @@map("gsPublications")
 }
+
+model gsContracts {
+  gsContractsID Int      @id @default(autoincrement())
+  PubID         Int?
+  DateAdded     DateTime? @db.DateTime2 @default(now())
+  Net           Decimal?  @db.Decimal(10,2)
+  RepIDs        String?   @db.NVarChar(500)
+  Description   String?   @db.NVarChar(1000)
+
+  @@map("gsContracts")
+}

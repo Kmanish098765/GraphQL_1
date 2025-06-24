@@ -15,7 +15,7 @@ const Dashboard = () => {
   const totalPublications = publicationsData?.gsPublications?.length || 0;
   const activePublications = publicationsData?.gsPublications?.filter(pub => pub.isActive)?.length || 0;
   const totalOrders = ordersData?.orders?.length || 0;
-  const totalRevenue = ordersData?.orders?.reduce((sum, order) => sum + order.total, 0) || 0;
+  const totalRevenue = ordersData?.orders?.reduce((sum, order) => sum + order.Net, 0) || 0;
 
   const pendingOrders = ordersData?.orders?.filter(order => order.status === 'pending')?.length || 0;
   const completedOrders = ordersData?.orders?.filter(order => order.status === 'completed')?.length || 0;
@@ -43,7 +43,7 @@ const Dashboard = () => {
         
         <div className="stat-card">
           <h3>Total Revenue</h3>
-          <p className="stat-number">${totalRevenue.toFixed(2)}</p>
+          <p className="stat-number">${totalRevenue?.toFixed(2)}</p>
         </div>
         
         <div className="stat-card">
@@ -75,7 +75,7 @@ const Dashboard = () => {
                 <tr key={order.id}>
                   <td>#{order.id}</td>
                   <td>{order.user?.FirstName} {order.user?.LastName}</td>
-                  <td>${order.total.toFixed(2)}</td>
+                  <td>${order.total?.toFixed(2)}</td>
                   <td>
                     <span className={`status status-${order.status}`}>
                       {order.status}

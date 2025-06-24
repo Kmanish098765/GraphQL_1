@@ -86,47 +86,68 @@ const resolvers = {
       }
     },
 
-    // Order queries using raw SQL (since Orders table structure might be different)
-    orders: async (_, __, { prisma }) => {
+    // Order queries using gsContracts backend with pagination
+    orders: async (_, { limit = 100, offset = 0 }, { prisma }) => {
       try {
-        const orders = await prisma.$queryRaw`
-          SELECT o.*, u.firstName, u.lastName, u.email 
-          FROM Orders o 
-          JOIN gsemployees u ON o.userId = u.gsEmployeesID 
-          ORDER BY o.createdAt DESC
-        `;
-        return orders;
+        const contracts = await prisma.gsContracts.findMany({
+          take: limit,
+          skip: offset,
+          orderBy: {
+            DateAdded: 'desc'
+          }
+        });
+        return contracts;
       } catch (error) {
         throw new Error(`Failed to fetch orders: ${error.message}`);
       }
     },
 
-    order: async (_, { id }, { prisma }) => {
+    order: async (_, { OrderId }, { prisma }) => {
       try {
-        const orders = await prisma.$queryRaw`
-          SELECT o.*, u.firstName, u.lastName, u.email 
-          FROM Orders o 
-          JOIN gsemployees u ON o.userId = u.gsEmployeesID 
-          WHERE o.id = ${parseInt(id)}
-        `;
-        return orders[0];
+        const contract = await prisma.gsContracts.findUnique({
+          where: {
+            gsContractsID: parseInt(OrderId)
+          }
+        });
+        return contract;
       } catch (error) {
         throw new Error(`Failed to fetch order: ${error.message}`);
       }
     },
 
-    ordersByUser: async (_, { userId }, { prisma }) => {
+    ordersByPublication: async (_, { PubID, limit = 100 }, { prisma }) => {
       try {
-        const orders = await prisma.$queryRaw`
-          SELECT o.*, u.firstName, u.lastName, u.email 
-          FROM Orders o 
-          JOIN gsemployees u ON o.userId = u.gsEmployeesID 
-          WHERE o.userId = ${parseInt(userId)} 
-          ORDER BY o.createdAt DESC
-        `;
-        return orders;
+        const contracts = await prisma.gsContracts.findMany({
+          where: {
+            PubID: parseInt(PubID)
+          },
+          take: limit,
+          orderBy: {
+            DateAdded: 'desc'
+          }
+        });
+        return contracts;
       } catch (error) {
-        throw new Error(`Failed to fetch orders by user: ${error.message}`);
+        throw new Error(`Failed to fetch orders by publication: ${error.message}`);
+      }
+    },
+
+    ordersByRepresentative: async (_, { RepID, limit = 100 }, { prisma }) => {
+      try {
+        const contracts = await prisma.gsContracts.findMany({
+          where: {
+            RepIDs: {
+              contains: RepID.toString()
+            }
+          },
+          take: limit,
+          orderBy: {
+            DateAdded: 'desc'
+          }
+        });
+        return contracts;
+      } catch (error) {
+        throw new Error(`Failed to fetch orders by representative: ${error.message}`);
       }
     },
   },
@@ -261,70 +282,51 @@ const resolvers = {
       }
     },
 
-    // Order mutations using transactions and raw SQL
+    // Order mutations using gsContracts backend
     createOrder: async (_, { input }, { prisma }) => {
       try {
-        const result = await prisma.$transaction(async (tx) => {
-          // Calculate total
-          let total = 0;
-          const orderItems = [];
-          
-          for (const item of input.publications) {
-            // Note: Since gsPublications doesn't have price, we'll use a default
-            const defaultPrice = 10.00;
-            const itemTotal = defaultPrice * item.quantity;
-            total += itemTotal;
-            
-            orderItems.push({
-              publicationId: item.publicationId,
-              quantity: item.quantity,
-              price: defaultPrice
-            });
+        const contract = await prisma.gsContracts.create({
+          data: {
+            PubID: input.PubID,
+            Net: input.Net,
+            RepIDs: input.RepIDs,
+            Description: input.Description,
+            DateAdded: new Date()
           }
-          
-          // Create order using raw SQL
-          const orders = await tx.$queryRaw`
-            INSERT INTO Orders (userId, total, status, createdAt) 
-            OUTPUT INSERTED.* 
-            VALUES (${parseInt(input.userId)}, ${total}, 'pending', GETDATE())
-          `;
-          
-          const order = orders[0];
-          
-          // Create order items
-          for (const item of orderItems) {
-            await tx.$queryRaw`
-              INSERT INTO OrderItems (orderId, publicationId, quantity, price) 
-              VALUES (${order.id}, ${item.publicationId}, ${item.quantity}, ${item.price})
-            `;
-          }
-          
-          return order;
         });
-        
-        return result;
+        return contract;
       } catch (error) {
         throw new Error(`Failed to create order: ${error.message}`);
       }
     },
 
-    updateOrderStatus: async (_, { id, status }, { prisma }) => {
+    updateOrder: async (_, { OrderId, input }, { prisma }) => {
       try {
-        const orders = await prisma.$queryRaw`
-          UPDATE Orders 
-          SET status = ${status} 
-          OUTPUT INSERTED.*
-          WHERE id = ${parseInt(id)}
-        `;
-        return orders[0];
+        const updateData = {};
+        if (input.PubID !== undefined) updateData.PubID = input.PubID;
+        if (input.Net !== undefined) updateData.Net = input.Net;
+        if (input.RepIDs !== undefined) updateData.RepIDs = input.RepIDs;
+        if (input.Description !== undefined) updateData.Description = input.Description;
+
+        const contract = await prisma.gsContracts.update({
+          where: {
+            gsContractsID: parseInt(OrderId)
+          },
+          data: updateData
+        });
+        return contract;
       } catch (error) {
-        throw new Error(`Failed to update order status: ${error.message}`);
+        throw new Error(`Failed to update order: ${error.message}`);
       }
     },
 
-    deleteOrder: async (_, { id }, { prisma }) => {
+    deleteOrder: async (_, { OrderId }, { prisma }) => {
       try {
-        await prisma.$queryRaw`DELETE FROM Orders WHERE id = ${parseInt(id)}`;
+        await prisma.gsContracts.delete({
+          where: {
+            gsContractsID: parseInt(OrderId)
+          }
+        });
         return true;
       } catch (error) {
         throw new Error(`Failed to delete order: ${error.message}`);
@@ -332,7 +334,7 @@ const resolvers = {
     },
   },
 
-  // Field resolvers for complex relationships
+  // Field resolvers for complex relationships and field mapping
   gsEmployees: {
     gsEmployeesId: (parent) => parent.gsEmployeesID,
     FirstName: (parent) => parent.firstName,
@@ -342,45 +344,48 @@ const resolvers = {
   },
 
   Order: {
-    user: async (parent, _, { prisma }) => {
-      try {
-        const user = await prisma.gsemployees.findUnique({
-          where: {
-            gsEmployeesID: parent.userId
-          }
-        });
-        return user;
-      } catch (error) {
-        throw new Error(`Failed to fetch order user: ${error.message}`);
-      }
-    },
+    // Map gsContracts fields to Order UI fields
+    OrderId: (parent) => parent.gsContractsID,
+    PubID: (parent) => parent.PubID,
+    DateAdded: (parent) => parent.DateAdded ? parent.DateAdded.toISOString() : null,
+    Net: (parent) => parent.Net ? parseFloat(parent.Net) : null,
+    RepIDs: (parent) => parent.RepIDs,
+    Description: (parent) => parent.Description,
 
-    publications: async (parent, _, { prisma }) => {
-      try {
-        const orderItems = await prisma.$queryRaw`
-          SELECT oi.*, p.PubName, p.PubAbbrev 
-          FROM OrderItems oi 
-          JOIN gsPublications p ON oi.publicationId = p.gsPublicationID 
-          WHERE oi.orderId = ${parent.id}
-        `;
-        return orderItems;
-      } catch (error) {
-        throw new Error(`Failed to fetch order publications: ${error.message}`);
-      }
-    },
-  },
-
-  OrderItem: {
+    // Resolve related publication
     publication: async (parent, _, { prisma }) => {
+      if (!parent.PubID) return null;
       try {
         const publication = await prisma.gsPublications.findUnique({
           where: {
-            gsPublicationID: parent.publicationId
+            gsPublicationID: parent.PubID
           }
         });
         return publication;
       } catch (error) {
-        throw new Error(`Failed to fetch order item publication: ${error.message}`);
+        console.error('Error fetching order publication:', error);
+        return null;
+      }
+    },
+
+    // Resolve representatives from comma-separated RepIDs
+    representatives: async (parent, _, { prisma }) => {
+      if (!parent.RepIDs) return [];
+      try {
+        const repIds = parent.RepIDs.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+        if (repIds.length === 0) return [];
+
+        const representatives = await prisma.gsemployees.findMany({
+          where: {
+            gsEmployeesID: {
+              in: repIds
+            }
+          }
+        });
+        return representatives;
+      } catch (error) {
+        console.error('Error fetching order representatives:', error);
+        return [];
       }
     },
   },
