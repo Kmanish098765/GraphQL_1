@@ -5,7 +5,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: "sqlserver://18.219.203.64:56321;database=Tier1Feature26;user=web;password=Mir%40b202L-sqlw%40b;encrypt=true;trustServerCertificate=true"
+      url: "sqlserver://18.219.203.64:56321;database=Tier1Feature26;user=web;password=Mir@b202L-sqlw@b;encrypt=true;trustServerCertificate=true"
     }
   },
   log: ['query', 'info', 'warn', 'error'],

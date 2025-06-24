@@ -16,7 +16,7 @@ async function startServer() {
   
   // Connect to MSSQL database (your existing connection - KEEPING THIS)
   console.log('🔗 Connecting to your existing MSSQL database...');
-  await connectToDatabase();
+//   await connectToDatabase();
   
   // Connect to database via Prisma (new connection)
   console.log('🔗 Connecting to Prisma Client...');

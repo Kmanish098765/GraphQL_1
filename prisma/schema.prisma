@@ -12,7 +12,7 @@ datasource db {
 
 // Models matching your actual database structure
 model gsemployees {
-  gsEmployeesID Int      @id @default(autoincrement())
+  gsEmployeesID Int      @id @default(autoincrement()) @map("gsEmployeesID")
   firstName     String?  @db.NVarChar(255)
   lastName      String?  @db.NVarChar(255)
   email         String?  @db.NVarChar(255)
@@ -25,7 +25,7 @@ model gsPublications {
   gsPublicationID    Int     @id @default(autoincrement())
   PubName            String? @db.NVarChar(255)
   PubAbbrev          String? @db.NVarChar(100)
-  IssueSet           String? @db.NVarChar(255)
+  IssueSet           Int?
   SubProductTypeId   Int?
   isActive           Boolean @default(true)
 

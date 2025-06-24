@@ -16,7 +16,7 @@ const Publications = () => {
   const [formData, setFormData] = useState({
     PubName: '',
     PubAbbrev: '',
-    IssueSet: '',
+    IssueSet: 0,
     SubProductTypeId: '',
     isActive: true
   });
@@ -67,7 +67,7 @@ const Publications = () => {
     setFormData({
       PubName: '',
       PubAbbrev: '',
-      IssueSet: '',
+      IssueSet: 0,
       SubProductTypeId: '',
       isActive: true
     });
@@ -111,7 +111,7 @@ const Publications = () => {
     setFormData({
       PubName: publication.PubName || '',
       PubAbbrev: publication.PubAbbrev || '',
-      IssueSet: publication.IssueSet || '',
+      IssueSet: publication.IssueSet || 0,
       SubProductTypeId: publication.SubProductTypeId || '',
       isActive: publication.isActive
     });

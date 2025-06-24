@@ -7,7 +7,7 @@ const resolvers = {
       try {
         const employees = await prisma.gsemployees.findMany({
           orderBy: {
-            Dateadded: 'desc'
+            dateAdded: 'desc'
           }
         });
         return employees;
@@ -20,7 +20,7 @@ const resolvers = {
       try {
         const employee = await prisma.gsemployees.findUnique({
           where: {
-            gsEmployeesId: parseInt(gsEmployeesId)
+            gsEmployeesID: parseInt(gsEmployeesId)
           }
         });
         return employee;
@@ -29,46 +29,72 @@ const resolvers = {
       }
     },
 
-    // Product queries (keeping existing structure)
-    products: async () => {
+    // gsPublications queries using Prisma
+    gsPublications: async () => {
       try {
-        // Using raw SQL for products since they might not exist in Prisma schema yet
-        const products = await prisma.$queryRaw`SELECT * FROM Products ORDER BY createdAt DESC`;
-        return products;
+        const publications = await prisma.gsPublications.findMany({
+          orderBy: {
+            PubName: 'asc'
+          }
+        });
+        return publications;
       } catch (error) {
-        throw new Error(`Failed to fetch products: ${error.message}`);
+        throw new Error(`Failed to fetch gsPublications: ${error.message}`);
       }
     },
 
-    product: async (_, { id }) => {
+    gsPublication: async (_, { gsPublicationID }) => {
       try {
-        const product = await prisma.$queryRaw`SELECT * FROM Products WHERE id = ${parseInt(id)}`;
-        return product[0];
+        const publication = await prisma.gsPublications.findUnique({
+          where: {
+            gsPublicationID: parseInt(gsPublicationID)
+          }
+        });
+        return publication;
       } catch (error) {
-        throw new Error(`Failed to fetch product: ${error.message}`);
+        throw new Error(`Failed to fetch gsPublication: ${error.message}`);
       }
     },
 
-    productsByCategory: async (_, { category }) => {
+    gsPublicationsByType: async (_, { SubProductTypeId }) => {
       try {
-        const products = await prisma.$queryRaw`
-          SELECT * FROM Products 
-          WHERE category = ${category} 
-          ORDER BY createdAt DESC
-        `;
-        return products;
+        const publications = await prisma.gsPublications.findMany({
+          where: {
+            SubProductTypeId: parseInt(SubProductTypeId)
+          },
+          orderBy: {
+            PubName: 'asc'
+          }
+        });
+        return publications;
       } catch (error) {
-        throw new Error(`Failed to fetch products by category: ${error.message}`);
+        throw new Error(`Failed to fetch gsPublications by type: ${error.message}`);
       }
     },
 
-    // Order queries (keeping existing structure)
+    activeGsPublications: async () => {
+      try {
+        const publications = await prisma.gsPublications.findMany({
+          where: {
+            isActive: true
+          },
+          orderBy: {
+            PubName: 'asc'
+          }
+        });
+        return publications;
+      } catch (error) {
+        throw new Error(`Failed to fetch active gsPublications: ${error.message}`);
+      }
+    },
+
+    // Order queries using raw SQL (since Orders table structure might be different)
     orders: async () => {
       try {
         const orders = await prisma.$queryRaw`
-          SELECT o.*, u.FirstName, u.LastName, u.Email 
+          SELECT o.*, u.firstName, u.lastName, u.email 
           FROM Orders o 
-          JOIN gsemployees u ON o.userId = u.gsEmployeesId 
+          JOIN gsemployees u ON o.userId = u.gsEmployeesID 
           ORDER BY o.createdAt DESC
         `;
         return orders;
@@ -79,13 +105,13 @@ const resolvers = {
 
     order: async (_, { id }) => {
       try {
-        const order = await prisma.$queryRaw`
-          SELECT o.*, u.FirstName, u.LastName, u.Email 
+        const orders = await prisma.$queryRaw`
+          SELECT o.*, u.firstName, u.lastName, u.email 
           FROM Orders o 
-          JOIN gsemployees u ON o.userId = u.gsEmployeesId 
+          JOIN gsemployees u ON o.userId = u.gsEmployeesID 
           WHERE o.id = ${parseInt(id)}
         `;
-        return order[0];
+        return orders[0];
       } catch (error) {
         throw new Error(`Failed to fetch order: ${error.message}`);
       }
@@ -94,9 +120,9 @@ const resolvers = {
     ordersByUser: async (_, { userId }) => {
       try {
         const orders = await prisma.$queryRaw`
-          SELECT o.*, u.FirstName, u.LastName, u.Email 
+          SELECT o.*, u.firstName, u.lastName, u.email 
           FROM Orders o 
-          JOIN gsemployees u ON o.userId = u.gsEmployeesId 
+          JOIN gsemployees u ON o.userId = u.gsEmployeesID 
           WHERE o.userId = ${parseInt(userId)} 
           ORDER BY o.createdAt DESC
         `;
@@ -113,10 +139,10 @@ const resolvers = {
       try {
         const employee = await prisma.gsemployees.create({
           data: {
-            FirstName: input.FirstName,
-            LastName: input.LastName,
-            Email: input.Email,
-            Dateadded: new Date()
+            firstName: input.FirstName,
+            lastName: input.LastName,
+            email: input.Email,
+            dateAdded: new Date()
           }
         });
         return employee;
@@ -128,13 +154,13 @@ const resolvers = {
     updateGsEmployee: async (_, { gsEmployeesId, input }) => {
       try {
         const updateData = {};
-        if (input.FirstName !== undefined) updateData.FirstName = input.FirstName;
-        if (input.LastName !== undefined) updateData.LastName = input.LastName;
-        if (input.Email !== undefined) updateData.Email = input.Email;
+        if (input.FirstName !== undefined) updateData.firstName = input.FirstName;
+        if (input.LastName !== undefined) updateData.lastName = input.LastName;
+        if (input.Email !== undefined) updateData.email = input.Email;
 
         const employee = await prisma.gsemployees.update({
           where: {
-            gsEmployeesId: parseInt(gsEmployeesId)
+            gsEmployeesID: parseInt(gsEmployeesId)
           },
           data: updateData
         });
@@ -148,7 +174,7 @@ const resolvers = {
       try {
         await prisma.gsemployees.delete({
           where: {
-            gsEmployeesId: parseInt(gsEmployeesId)
+            gsEmployeesID: parseInt(gsEmployeesId)
           }
         });
         return true;
@@ -157,110 +183,125 @@ const resolvers = {
       }
     },
 
-    // Product mutations (using raw SQL for now)
-    createProduct: async (_, { input }) => {
+    // gsPublications mutations using Prisma
+    createGsPublication: async (_, { input }) => {
       try {
-        const result = await prisma.$queryRaw`
-          INSERT INTO Products (name, description, price, category, stock, createdAt) 
-          OUTPUT INSERTED.* 
-          VALUES (${input.name}, ${input.description}, ${input.price}, ${input.category}, ${input.stock}, GETDATE())
-        `;
-        return result[0];
+        const publication = await prisma.gsPublications.create({
+          data: {
+            PubName: input.PubName,
+            PubAbbrev: input.PubAbbrev,
+            IssueSet: input.IssueSet,
+            SubProductTypeId: input.SubProductTypeId,
+            isActive: input.isActive !== undefined ? input.isActive : true
+          }
+        });
+        return publication;
       } catch (error) {
-        throw new Error(`Failed to create product: ${error.message}`);
+        throw new Error(`Failed to create gsPublication: ${error.message}`);
       }
     },
 
-    updateProduct: async (_, { id, input }) => {
+    updateGsPublication: async (_, { gsPublicationID, input }) => {
       try {
-        const updateFields = [];
-        const params = [parseInt(id)];
-        
-        if (input.name !== undefined) {
-          updateFields.push('name = ?');
-          params.unshift(input.name);
-        }
-        if (input.description !== undefined) {
-          updateFields.push('description = ?');
-          params.unshift(input.description);
-        }
-        if (input.price !== undefined) {
-          updateFields.push('price = ?');
-          params.unshift(input.price);
-        }
-        if (input.category !== undefined) {
-          updateFields.push('category = ?');
-          params.unshift(input.category);
-        }
-        if (input.stock !== undefined) {
-          updateFields.push('stock = ?');
-          params.unshift(input.stock);
-        }
+        const updateData = {};
+        if (input.PubName !== undefined) updateData.PubName = input.PubName;
+        if (input.PubAbbrev !== undefined) updateData.PubAbbrev = input.PubAbbrev;
+        if (input.IssueSet !== undefined) updateData.IssueSet = input.IssueSet;
+        if (input.SubProductTypeId !== undefined) updateData.SubProductTypeId = input.SubProductTypeId;
+        if (input.isActive !== undefined) updateData.isActive = input.isActive;
 
-        const result = await prisma.$queryRaw`
-          UPDATE Products 
-          SET ${updateFields.join(', ')} 
-          OUTPUT INSERTED.* 
-          WHERE id = ${parseInt(id)}
-        `;
-        return result[0];
+        const publication = await prisma.gsPublications.update({
+          where: {
+            gsPublicationID: parseInt(gsPublicationID)
+          },
+          data: updateData
+        });
+        return publication;
       } catch (error) {
-        throw new Error(`Failed to update product: ${error.message}`);
+        throw new Error(`Failed to update gsPublication: ${error.message}`);
       }
     },
 
-    deleteProduct: async (_, { id }) => {
+    deleteGsPublication: async (_, { gsPublicationID }) => {
       try {
-        await prisma.$queryRaw`DELETE FROM Products WHERE id = ${parseInt(id)}`;
+        await prisma.gsPublications.delete({
+          where: {
+            gsPublicationID: parseInt(gsPublicationID)
+          }
+        });
         return true;
       } catch (error) {
-        throw new Error(`Failed to delete product: ${error.message}`);
+        throw new Error(`Failed to delete gsPublication: ${error.message}`);
       }
     },
 
-    // Order mutations (using raw SQL for transactions)
+    toggleGsPublicationStatus: async (_, { gsPublicationID }) => {
+      try {
+        // First get the current status
+        const currentPublication = await prisma.gsPublications.findUnique({
+          where: {
+            gsPublicationID: parseInt(gsPublicationID)
+          }
+        });
+
+        if (!currentPublication) {
+          throw new Error('Publication not found');
+        }
+
+        // Toggle the status
+        const publication = await prisma.gsPublications.update({
+          where: {
+            gsPublicationID: parseInt(gsPublicationID)
+          },
+          data: {
+            isActive: !currentPublication.isActive
+          }
+        });
+        return publication;
+      } catch (error) {
+        throw new Error(`Failed to toggle gsPublication status: ${error.message}`);
+      }
+    },
+
+    // Order mutations using transactions and raw SQL
     createOrder: async (_, { input }) => {
       try {
-        // Use Prisma transaction
         const result = await prisma.$transaction(async (tx) => {
           // Calculate total
           let total = 0;
           const orderItems = [];
           
-          for (const item of input.products) {
-            const product = await tx.$queryRaw`SELECT price FROM Products WHERE id = ${parseInt(item.productId)}`;
-            
-            if (product.length === 0) {
-              throw new Error(`Product with id ${item.productId} not found`);
-            }
-            
-            const price = product[0].price;
-            const itemTotal = price * item.quantity;
+          for (const item of input.publications) {
+            // Note: Since gsPublications doesn't have price, we'll use a default
+            const defaultPrice = 10.00;
+            const itemTotal = defaultPrice * item.quantity;
             total += itemTotal;
             
             orderItems.push({
-              productId: item.productId,
+              publicationId: item.publicationId,
               quantity: item.quantity,
-              price: price
+              price: defaultPrice
             });
           }
           
-          // Create order
-          const order = await tx.$queryRaw`
+          // Create order using raw SQL
+          const orders = await tx.$queryRaw`
             INSERT INTO Orders (userId, total, status, createdAt) 
             OUTPUT INSERTED.* 
             VALUES (${parseInt(input.userId)}, ${total}, 'pending', GETDATE())
           `;
           
+          const order = orders[0];
+          
           // Create order items
           for (const item of orderItems) {
             await tx.$queryRaw`
-              INSERT INTO OrderItems (orderId, productId, quantity, price) 
-              VALUES (${order[0].id}, ${parseInt(item.productId)}, ${item.quantity}, ${item.price})
+              INSERT INTO OrderItems (orderId, publicationId, quantity, price) 
+              VALUES (${order.id}, ${parseInt(item.publicationId)}, ${item.quantity}, ${item.price})
             `;
           }
           
-          return order[0];
+          return order;
         });
         
         return result;
@@ -273,7 +314,7 @@ const resolvers = {
       try {
         const result = await prisma.$queryRaw`
           UPDATE Orders 
-          SET status = ${status} 
+          SET status = ${status}
           OUTPUT INSERTED.* 
           WHERE id = ${parseInt(id)}
         `;
@@ -299,13 +340,22 @@ const resolvers = {
     },
   },
 
+  // Field resolvers to map database field names to GraphQL field names
+  gsEmployees: {
+    gsEmployeesId: (parent) => parent.gsEmployeesID,
+    FirstName: (parent) => parent.firstName,
+    LastName: (parent) => parent.lastName,
+    Email: (parent) => parent.email,
+    Dateadded: (parent) => parent.dateAdded,
+  },
+
   // Nested resolvers
   Order: {
     user: async (parent) => {
       try {
         const user = await prisma.gsemployees.findUnique({
           where: {
-            gsEmployeesId: parent.userId
+            gsEmployeesID: parent.userId
           }
         });
         return user;
@@ -314,30 +364,32 @@ const resolvers = {
       }
     },
 
-    products: async (parent) => {
+    publications: async (parent) => {
       try {
-        const products = await prisma.$queryRaw`
-          SELECT oi.*, p.name as productName, p.description as productDescription 
+        const publications = await prisma.$queryRaw`
+          SELECT oi.*, p.PubName, p.PubAbbrev, p.IssueSet 
           FROM OrderItems oi 
-          JOIN Products p ON oi.productId = p.id 
+          JOIN gsPublications p ON oi.publicationId = p.gsPublicationID 
           WHERE oi.orderId = ${parent.id}
         `;
-        return products;
+        return publications;
       } catch (error) {
-        throw new Error(`Failed to fetch order products: ${error.message}`);
+        throw new Error(`Failed to fetch order publications: ${error.message}`);
       }
     },
   },
 
   OrderItem: {
-    product: async (parent) => {
+    publication: async (parent) => {
       try {
-        const product = await prisma.$queryRaw`
-          SELECT * FROM Products WHERE id = ${parseInt(parent.productId)}
-        `;
-        return product[0];
+        const publication = await prisma.gsPublications.findUnique({
+          where: {
+            gsPublicationID: parseInt(parent.publicationId)
+          }
+        });
+        return publication;
       } catch (error) {
-        throw new Error(`Failed to fetch order item product: ${error.message}`);
+        throw new Error(`Failed to fetch order item publication: ${error.message}`);
       }
     },
   },

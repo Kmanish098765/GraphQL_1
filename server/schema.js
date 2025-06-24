@@ -28,7 +28,7 @@ const typeDefs = gql`
     gsPublicationID: Int
     PubName: String
     PubAbbrev: String
-    IssueSet: String
+    IssueSet: Int
     SubProductTypeId: Int
     isActive: Boolean
   }
@@ -37,7 +37,7 @@ const typeDefs = gql`
   input CreateGsPublicationInput {
     PubName: String!
     PubAbbrev: String
-    IssueSet: String
+    IssueSet: Int
     SubProductTypeId: Int
     isActive: Boolean
   }
@@ -45,7 +45,7 @@ const typeDefs = gql`
   input UpdateGsPublicationInput {
     PubName: String
     PubAbbrev: String
-    IssueSet: String
+    IssueSet: Int
     SubProductTypeId: Int
     isActive: Boolean
   }
