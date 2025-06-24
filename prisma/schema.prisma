@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+// Models matching your actual database structure
+model gsemployees {
+  gsEmployeesID Int      @id @default(autoincrement())
+  firstName     String?  @db.NVarChar(255)
+  lastName      String?  @db.NVarChar(255)
+  email         String?  @db.NVarChar(255)
+  dateAdded     DateTime? @db.DateTime2
+
+  @@map("gsemployees")
+}
+
+model gsPublications {
+  gsPublicationID    Int     @id @default(autoincrement())
+  PubName            String? @db.NVarChar(255)
+  PubAbbrev          String? @db.NVarChar(100)
+  IssueSet           String? @db.NVarChar(255)
+  SubProductTypeId   Int?
+  isActive           Boolean @default(true)
+
+  @@map("gsPublications")
+}
