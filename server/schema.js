@@ -23,7 +23,7 @@ const typeDefs = gql`
     Email: String
   }
 
-  # gsPublications Type (replacing Product)
+  # gsPublications Type
   type gsPublications {
     gsPublicationID: Int
     PubName: String
@@ -61,7 +61,7 @@ const typeDefs = gql`
     publications: [OrderItem]
   }
 
-  # OrderItem Type (updated to reference gsPublications)
+  # OrderItem Type (references gsPublications)
   type OrderItem {
     id: Int
     orderId: Int
@@ -88,7 +88,7 @@ const typeDefs = gql`
     gsEmployees: [gsEmployees]
     gsEmployee(gsEmployeesId: Int!): gsEmployees
 
-    # gsPublications Queries (replacing Product queries)
+    # gsPublications Queries
     gsPublications: [gsPublications]
     gsPublication(gsPublicationID: Int!): gsPublications
     gsPublicationsByType(SubProductTypeId: Int!): [gsPublications]
@@ -107,7 +107,7 @@ const typeDefs = gql`
     updateGsEmployee(gsEmployeesId: Int!, input: UpdateGsEmployeeInput!): gsEmployees
     deleteGsEmployee(gsEmployeesId: Int!): Boolean
 
-    # gsPublications Mutations (replacing Product mutations)
+    # gsPublications Mutations
     createGsPublication(input: CreateGsPublicationInput!): gsPublications
     updateGsPublication(gsPublicationID: Int!, input: UpdateGsPublicationInput!): gsPublications
     deleteGsPublication(gsPublicationID: Int!): Boolean
@@ -121,7 +121,7 @@ const typeDefs = gql`
 
   type Subscription {
     orderCreated: Order!
-    productUpdated: gsPublications!
+    gsPublicationUpdated: gsPublications!
   }
 `;
 

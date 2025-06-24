@@ -4,17 +4,10 @@
   "description": "Full-stack application using Apollo Client, GraphQL, MSSQL, and Prisma",
   "main": "server/index.js",
   "scripts": {
-    "dev": "nodemon server/index-prisma.js",
-    "dev:prisma": "nodemon server/index-prisma.js",
-    "dev:hybrid": "nodemon server/index-hybrid.js",
-    "dev:original": "nodemon server/index.js",
-    "start": "node server/index-prisma.js",
-    "start:prisma": "node server/index-prisma.js",
-    "start:hybrid": "node server/index-hybrid.js",
+    "dev": "nodemon server/index.js",
+    "start": "node server/index.js",
     "client": "cd client && npm start",
     "server": "node server/index.js",
-    "server:prisma": "node server/index-prisma.js",
-    "server:hybrid": "node server/index-hybrid.js",
     "build": "cd client && npm run build",
     "prisma:generate": "npx prisma generate",
     "prisma:db:pull": "npx prisma db pull",
@@ -41,7 +34,8 @@
     "apollo",
     "mssql",
     "express",
-    "nodejs"
+    "nodejs",
+    "prisma"
   ],
   "author": "",
   "license": "ISC"

@@ -1,13 +1,13 @@
 # GraphQL MSSQL Application
 
-A full-stack application built with **Apollo Client**, **GraphQL**, **Express.js**, and **MSSQL** database integration. This application provides a complete CRUD interface for managing users, products, and orders with a modern React frontend.
+A full-stack application built with **Apollo Client**, **GraphQL**, **Express.js**, and **MSSQL** database integration. This application provides a complete CRUD interface for managing users, gsPublications, and orders with a modern React frontend.
 
 ## 🚀 Features
 
 - **GraphQL API** with Apollo Server
 - **MSSQL Database** integration with connection pooling
 - **React Frontend** with Apollo Client
-- **Full CRUD Operations** for Users, Products, and Orders
+- **Full CRUD Operations** for Users, gsPublications, and Orders
 - **Real-time Dashboard** with statistics
 - **Responsive Design** with modern UI/UX
 - **Transaction Support** for complex operations
@@ -115,20 +115,20 @@ npm start
 
 The application uses the following database tables:
 
-### Users
-- `id` (Primary Key)
-- `name`
-- `email` (Unique)
-- `createdAt`
+### gsEmployees (Users)
+- `gsEmployeesID` (Primary Key)
+- `firstName`
+- `lastName`
+- `email`
+- `dateAdded`
 
-### Products
-- `id` (Primary Key)
-- `name`
-- `description`
-- `price`
-- `category`
-- `stock`
-- `createdAt`
+### gsPublications
+- `gsPublicationID` (Primary Key)
+- `PubName`
+- `PubAbbrev`
+- `IssueSet`
+- `SubProductTypeId`
+- `isActive`
 
 ### Orders
 - `id` (Primary Key)
@@ -140,29 +140,31 @@ The application uses the following database tables:
 ### OrderItems
 - `id` (Primary Key)
 - `orderId` (Foreign Key)
-- `productId` (Foreign Key)
+- `publicationId` (Foreign Key)
 - `quantity`
 - `price`
 
 ## 🔧 GraphQL Operations
 
 ### Queries
-- `users` - Get all users
-- `user(id)` - Get user by ID
-- `products` - Get all products
-- `product(id)` - Get product by ID
-- `productsByCategory(category)` - Get products by category
+- `gsEmployees` - Get all users
+- `gsEmployee(gsEmployeesId)` - Get user by ID
+- `gsPublications` - Get all publications
+- `gsPublication(gsPublicationID)` - Get publication by ID
+- `gsPublicationsByType(SubProductTypeId)` - Get publications by type
+- `activeGsPublications` - Get active publications
 - `orders` - Get all orders
 - `order(id)` - Get order by ID
 - `ordersByUser(userId)` - Get orders by user
 
 ### Mutations
-- `createUser(input)` - Create new user
-- `updateUser(id, input)` - Update user
-- `deleteUser(id)` - Delete user
-- `createProduct(input)` - Create new product
-- `updateProduct(id, input)` - Update product
-- `deleteProduct(id)` - Delete product
+- `createGsEmployee(input)` - Create new user
+- `updateGsEmployee(gsEmployeesId, input)` - Update user
+- `deleteGsEmployee(gsEmployeesId)` - Delete user
+- `createGsPublication(input)` - Create new publication
+- `updateGsPublication(gsPublicationID, input)` - Update publication
+- `deleteGsPublication(gsPublicationID)` - Delete publication
+- `toggleGsPublicationStatus(gsPublicationID)` - Toggle publication status
 - `createOrder(input)` - Create new order
 - `updateOrderStatus(id, status)` - Update order status
 - `deleteOrder(id)` - Delete order
@@ -173,41 +175,44 @@ The application uses the following database tables:
 ```graphql
 # Get all users
 query GetUsers {
-  users {
-    id
-    name
-    email
-    createdAt
+  gsEmployees {
+    gsEmployeesId
+    FirstName
+    LastName
+    Email
+    Dateadded
   }
 }
 
-# Get all products
-query GetProducts {
-  products {
-    id
-    name
-    description
-    price
-    category
-    stock
+# Get all publications
+query GetPublications {
+  gsPublications {
+    gsPublicationID
+    PubName
+    PubAbbrev
+    IssueSet
+    SubProductTypeId
+    isActive
   }
 }
 
-# Get orders with user and product details
+# Get orders with user and publication details
 query GetOrders {
   orders {
     id
     total
     status
     user {
-      name
-      email
+      FirstName
+      LastName
+      Email
     }
-    products {
+    publications {
       quantity
       price
-      product {
-        name
+      publication {
+        PubName
+        PubAbbrev
       }
     }
   }
@@ -218,28 +223,30 @@ query GetOrders {
 ```graphql
 # Create a new user
 mutation CreateUser {
-  createUser(input: {
-    name: "John Doe"
-    email: "john@example.com"
+  createGsEmployee(input: {
+    FirstName: "John"
+    LastName: "Doe"
+    Email: "john@example.com"
   }) {
-    id
-    name
-    email
+    gsEmployeesId
+    FirstName
+    LastName
+    Email
   }
 }
 
-# Create a new product
-mutation CreateProduct {
-  createProduct(input: {
-    name: "New Product"
-    description: "Product description"
-    price: 99.99
-    category: "Electronics"
-    stock: 10
+# Create a new publication
+mutation CreatePublication {
+  createGsPublication(input: {
+    PubName: "Tech Weekly"
+    PubAbbrev: "TW"
+    IssueSet: 52
+    SubProductTypeId: 1
+    isActive: true
   }) {
-    id
-    name
-    price
+    gsPublicationID
+    PubName
+    PubAbbrev
   }
 }
 
@@ -247,9 +254,9 @@ mutation CreateProduct {
 mutation CreateOrder {
   createOrder(input: {
     userId: 1
-    products: [
+    publications: [
       {
-        productId: 1
+        publicationId: 1
         quantity: 2
       }
     ]
@@ -266,7 +273,7 @@ mutation CreateOrder {
 ### Dashboard
 - Real-time statistics
 - Recent orders overview
-- Summary cards for users, products, orders, and revenue
+- Summary cards for users, publications, orders, and revenue
 
 ### User Management
 - View all users in a table
@@ -274,12 +281,12 @@ mutation CreateOrder {
 - Edit existing users
 - Delete users with confirmation
 
-### Product Management
-- View all products with details
-- Add new products with comprehensive form
-- Edit product information
-- Delete products
-- Stock management
+### Publication Management
+- View all publications with details
+- Add new publications with comprehensive form
+- Edit publication information
+- Delete publications
+- Status management (active/inactive)
 
 ### Order Management
 - View all orders with customer details
