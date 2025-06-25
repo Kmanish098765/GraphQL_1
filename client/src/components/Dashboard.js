@@ -46,7 +46,7 @@ const Dashboard = () => {
           <p className="stat-number">${totalRevenue?.toFixed(2)}</p>
         </div>
         
-        <div className="stat-card">
+        {/* <div className="stat-card">
           <h3>Pending Orders</h3>
           <p className="stat-number">{pendingOrders}</p>
         </div>
@@ -54,7 +54,7 @@ const Dashboard = () => {
         <div className="stat-card">
           <h3>Completed Orders</h3>
           <p className="stat-number">{completedOrders}</p>
-        </div>
+        </div> */}
       </div>
 
       <div className="recent-activity">
@@ -66,22 +66,22 @@ const Dashboard = () => {
                 <th>Order ID</th>
                 <th>Customer</th>
                 <th>Total</th>
-                <th>Status</th>
+                {/* <th>Status</th> */}
                 <th>Date</th>
               </tr>
             </thead>
             <tbody>
               {ordersData?.orders?.slice(0, 5).map(order => (
-                <tr key={order.id}>
-                  <td>#{order.id}</td>
-                  <td>{order.user?.FirstName} {order.user?.LastName}</td>
-                  <td>${order.total?.toFixed(2)}</td>
-                  <td>
-                    <span className={`status status-${order.status}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                <tr key={order.OrderId}>
+                  <td>#{order.OrderId}</td>
+                  <td>{order.representatives[0]?.FirstName} {order.representatives[0]?.LastName}</td>
+                  <td>${order.Net?.toFixed(2)}</td>
+                    {/* <td>
+                        <span className={`status status-${order.status}`}>
+                        {order.status}
+                        </span>
+                  </td> */}
+                  <td>{new Date(order.DateAdded).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
