@@ -7,6 +7,9 @@ const Orders = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createFormData, setCreateFormData] = useState({
+    CustomerID: '',
+    Yr: new Date().getFullYear(),
+    Mnth: new Date().getMonth() + 1,
     PubID: '',
     Net: '',
     RepIDs: '',
@@ -59,6 +62,9 @@ const Orders = () => {
       await createOrder({
         variables: {
           input: {
+            CustomerID: parseInt(createFormData.CustomerID),
+            Yr: parseInt(createFormData.Yr),
+            Mnth: parseInt(createFormData.Mnth),
             PubID: parseInt(createFormData.PubID),
             Net: parseFloat(createFormData.Net),
             RepIDs: createFormData.RepIDs,
@@ -68,7 +74,15 @@ const Orders = () => {
       });
       refetch();
       setShowCreateForm(false);
-      setCreateFormData({ PubID: '', Net: '', RepIDs: '', Description: '' });
+      setCreateFormData({ 
+        CustomerID: '',
+        Yr: new Date().getFullYear(),
+        Mnth: new Date().getMonth() + 1,
+        PubID: '', 
+        Net: '', 
+        RepIDs: '', 
+        Description: '' 
+      });
     } catch (err) {
       console.error('Error creating order:', err);
       alert('Error creating order: ' + err.message);
@@ -132,6 +146,33 @@ const Orders = () => {
               <button className="close-btn" onClick={() => setShowCreateForm(false)}>×</button>
             </div>
             <form onSubmit={handleCreate} className="order-form">
+              <div className="form-group">
+                <label>Customer ID:</label>
+                <input
+                  type="number"
+                  value={createFormData.CustomerID}
+                  onChange={(e) => setCreateFormData({...createFormData, CustomerID: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Year:</label>
+                <input
+                  type="number"
+                  value={createFormData.Yr}
+                  onChange={(e) => setCreateFormData({...createFormData, Yr: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Month:</label>
+                <input
+                  type="number"
+                  value={createFormData.Mnth}
+                  onChange={(e) => setCreateFormData({...createFormData, Mnth: e.target.value})}
+                  required
+                />
+              </div>
               <div className="form-group">
                 <label>Publication:</label>
                 <select

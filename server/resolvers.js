@@ -3,7 +3,7 @@ const resolvers = {
     // GsEmployee queries using Prisma
     gsEmployees: async (_, __, { prisma }) => {
       try {
-        const employees = await prisma.gsemployees.findMany({
+        const employees = await prisma.gsEmployees.findMany({
           orderBy: {
             dateAdded: 'desc'
           }
@@ -16,7 +16,7 @@ const resolvers = {
 
     gsEmployee: async (_, { gsEmployeesId }, { prisma }) => {
       try {
-        const employee = await prisma.gsemployees.findUnique({
+        const employee = await prisma.gsEmployees.findUnique({
           where: {
             gsEmployeesID: parseInt(gsEmployeesId)
           }
@@ -27,10 +27,18 @@ const resolvers = {
       }
     },
 
-    // gsPublications queries using Prisma
+    // gsPublications queries using Prisma (essential fields only)
     gsPublications: async (_, __, { prisma }) => {
       try {
         const publications = await prisma.gsPublications.findMany({
+          select: {
+            gsPublicationID: true,
+            PubName: true,
+            PubAbbrev: true,
+            IssueSet: true,
+            SubProductTypeID: true,
+            IsActive: true
+          },
           orderBy: {
             PubName: 'asc'
           }
@@ -46,6 +54,14 @@ const resolvers = {
         const publication = await prisma.gsPublications.findUnique({
           where: {
             gsPublicationID: parseInt(gsPublicationID)
+          },
+          select: {
+            gsPublicationID: true,
+            PubName: true,
+            PubAbbrev: true,
+            IssueSet: true,
+            SubProductTypeID: true,
+            IsActive: true
           }
         });
         return publication;
@@ -54,11 +70,19 @@ const resolvers = {
       }
     },
 
-    gsPublicationsByType: async (_, { SubProductTypeId }, { prisma }) => {
+    gsPublicationsByType: async (_, { SubProductTypeID }, { prisma }) => {
       try {
         const publications = await prisma.gsPublications.findMany({
           where: {
-            SubProductTypeId: parseInt(SubProductTypeId)
+            SubProductTypeID: parseInt(SubProductTypeID)
+          },
+          select: {
+            gsPublicationID: true,
+            PubName: true,
+            PubAbbrev: true,
+            IssueSet: true,
+            SubProductTypeID: true,
+            IsActive: true
           },
           orderBy: {
             PubName: 'asc'
@@ -74,7 +98,15 @@ const resolvers = {
       try {
         const publications = await prisma.gsPublications.findMany({
           where: {
-            isActive: true
+            IsActive: true
+          },
+          select: {
+            gsPublicationID: true,
+            PubName: true,
+            PubAbbrev: true,
+            IssueSet: true,
+            SubProductTypeID: true,
+            IsActive: true
           },
           orderBy: {
             PubName: 'asc'
@@ -86,12 +118,23 @@ const resolvers = {
       }
     },
 
-    // Order queries using gsContracts backend with pagination
+    // Order queries using gsContracts backend (essential fields only)
     orders: async (_, { limit = 100, offset = 0 }, { prisma }) => {
       try {
         const contracts = await prisma.gsContracts.findMany({
           take: limit,
           skip: offset,
+          select: {
+            gsContractsID: true,
+            CustomerID: true,
+            Yr: true,
+            Mnth: true,
+            PubID: true,
+            Net: true,
+            DateAdded: true,
+            RepIDs: true,
+            Description: true
+          },
           orderBy: {
             DateAdded: 'desc'
           }
@@ -107,6 +150,17 @@ const resolvers = {
         const contract = await prisma.gsContracts.findUnique({
           where: {
             gsContractsID: parseInt(OrderId)
+          },
+          select: {
+            gsContractsID: true,
+            CustomerID: true,
+            Yr: true,
+            Mnth: true,
+            PubID: true,
+            Net: true,
+            DateAdded: true,
+            RepIDs: true,
+            Description: true
           }
         });
         return contract;
@@ -122,6 +176,17 @@ const resolvers = {
             PubID: parseInt(PubID)
           },
           take: limit,
+          select: {
+            gsContractsID: true,
+            CustomerID: true,
+            Yr: true,
+            Mnth: true,
+            PubID: true,
+            Net: true,
+            DateAdded: true,
+            RepIDs: true,
+            Description: true
+          },
           orderBy: {
             DateAdded: 'desc'
           }
@@ -141,6 +206,17 @@ const resolvers = {
             }
           },
           take: limit,
+          select: {
+            gsContractsID: true,
+            CustomerID: true,
+            Yr: true,
+            Mnth: true,
+            PubID: true,
+            Net: true,
+            DateAdded: true,
+            RepIDs: true,
+            Description: true
+          },
           orderBy: {
             DateAdded: 'desc'
           }
@@ -156,12 +232,13 @@ const resolvers = {
     // GsEmployee mutations using Prisma
     createGsEmployee: async (_, { input }, { prisma }) => {
       try {
-        const employee = await prisma.gsemployees.create({
+        const employee = await prisma.gsEmployees.create({
           data: {
             firstName: input.FirstName,
             lastName: input.LastName,
             email: input.Email,
-            dateAdded: new Date()
+            dateAdded: new Date(),
+            gsDeptID: 1 // Default department ID - you may want to make this configurable
           }
         });
         return employee;
@@ -177,7 +254,7 @@ const resolvers = {
         if (input.LastName !== undefined) updateData.lastName = input.LastName;
         if (input.Email !== undefined) updateData.email = input.Email;
 
-        const employee = await prisma.gsemployees.update({
+        const employee = await prisma.gsEmployees.update({
           where: {
             gsEmployeesID: parseInt(gsEmployeesId)
           },
@@ -191,7 +268,7 @@ const resolvers = {
 
     deleteGsEmployee: async (_, { gsEmployeesId }, { prisma }) => {
       try {
-        await prisma.gsemployees.delete({
+        await prisma.gsEmployees.delete({
           where: {
             gsEmployeesID: parseInt(gsEmployeesId)
           }
@@ -202,7 +279,7 @@ const resolvers = {
       }
     },
 
-    // gsPublications mutations using Prisma
+    // gsPublications mutations using Prisma (essential fields only)
     createGsPublication: async (_, { input }, { prisma }) => {
       try {
         const publication = await prisma.gsPublications.create({
@@ -210,8 +287,9 @@ const resolvers = {
             PubName: input.PubName,
             PubAbbrev: input.PubAbbrev,
             IssueSet: input.IssueSet,
-            SubProductTypeId: input.SubProductTypeId,
-            isActive: input.isActive !== undefined ? input.isActive : true
+            SubProductTypeID: input.SubProductTypeID,
+            IsActive: input.IsActive !== undefined ? input.IsActive : true,
+            CreatedOn: new Date()
           }
         });
         return publication;
@@ -226,8 +304,10 @@ const resolvers = {
         if (input.PubName !== undefined) updateData.PubName = input.PubName;
         if (input.PubAbbrev !== undefined) updateData.PubAbbrev = input.PubAbbrev;
         if (input.IssueSet !== undefined) updateData.IssueSet = input.IssueSet;
-        if (input.SubProductTypeId !== undefined) updateData.SubProductTypeId = input.SubProductTypeId;
-        if (input.isActive !== undefined) updateData.isActive = input.isActive;
+        if (input.SubProductTypeID !== undefined) updateData.SubProductTypeID = input.SubProductTypeID;
+        if (input.IsActive !== undefined) updateData.IsActive = input.IsActive;
+        
+        updateData.UpdatedOn = new Date();
 
         const publication = await prisma.gsPublications.update({
           where: {
@@ -273,7 +353,8 @@ const resolvers = {
             gsPublicationID: parseInt(gsPublicationID)
           },
           data: {
-            isActive: !currentPublication.isActive
+            IsActive: !currentPublication.IsActive,
+            UpdatedOn: new Date()
           }
         });
         return publication;
@@ -282,11 +363,14 @@ const resolvers = {
       }
     },
 
-    // Order mutations using gsContracts backend
+    // Order mutations using gsContracts backend (essential fields only)
     createOrder: async (_, { input }, { prisma }) => {
       try {
         const contract = await prisma.gsContracts.create({
           data: {
+            CustomerID: input.CustomerID,
+            Yr: input.Yr,
+            Mnth: input.Mnth,
             PubID: input.PubID,
             Net: input.Net,
             RepIDs: input.RepIDs,
@@ -303,10 +387,15 @@ const resolvers = {
     updateOrder: async (_, { OrderId, input }, { prisma }) => {
       try {
         const updateData = {};
+        if (input.CustomerID !== undefined) updateData.CustomerID = input.CustomerID;
+        if (input.Yr !== undefined) updateData.Yr = input.Yr;
+        if (input.Mnth !== undefined) updateData.Mnth = input.Mnth;
         if (input.PubID !== undefined) updateData.PubID = input.PubID;
         if (input.Net !== undefined) updateData.Net = input.Net;
         if (input.RepIDs !== undefined) updateData.RepIDs = input.RepIDs;
         if (input.Description !== undefined) updateData.Description = input.Description;
+        
+        updateData.DateModified = new Date();
 
         const contract = await prisma.gsContracts.update({
           where: {
@@ -344,11 +433,14 @@ const resolvers = {
   },
 
   Order: {
-    // Map gsContracts fields to Order UI fields
+    // Map gsContracts fields to Order UI fields (essential fields only)
     OrderId: (parent) => parent.gsContractsID,
+    CustomerID: (parent) => parent.CustomerID,
+    Yr: (parent) => parent.Yr,
+    Mnth: (parent) => parent.Mnth,
     PubID: (parent) => parent.PubID,
-    DateAdded: (parent) => parent.DateAdded ? parent.DateAdded.toISOString() : null,
     Net: (parent) => parent.Net ? parseFloat(parent.Net) : null,
+    DateAdded: (parent) => parent.DateAdded ? parent.DateAdded.toISOString() : null,
     RepIDs: (parent) => parent.RepIDs,
     Description: (parent) => parent.Description,
 
@@ -359,6 +451,14 @@ const resolvers = {
         const publication = await prisma.gsPublications.findUnique({
           where: {
             gsPublicationID: parent.PubID
+          },
+          select: {
+            gsPublicationID: true,
+            PubName: true,
+            PubAbbrev: true,
+            IssueSet: true,
+            SubProductTypeID: true,
+            IsActive: true
           }
         });
         return publication;
@@ -375,7 +475,7 @@ const resolvers = {
         const repIds = parent.RepIDs.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
         if (repIds.length === 0) return [];
 
-        const representatives = await prisma.gsemployees.findMany({
+        const representatives = await prisma.gsEmployees.findMany({
           where: {
             gsEmployeesID: {
               in: repIds

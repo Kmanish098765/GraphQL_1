@@ -20,8 +20,8 @@ const Publications = () => {
     PubName: '',
     PubAbbrev: '',
     IssueSet: 0,
-    SubProductTypeId: '',
-    isActive: true
+    SubProductTypeID: '',
+    IsActive: true
   });
 
   const { loading, error, data, refetch } = useQuery(
@@ -82,8 +82,8 @@ const Publications = () => {
       PubName: '',
       PubAbbrev: '',
       IssueSet: 0,
-      SubProductTypeId: '',
-      isActive: true
+      SubProductTypeID: '',
+      IsActive: true
     });
     setShowForm(false);
     setEditingPublication(null);
@@ -96,8 +96,8 @@ const Publications = () => {
       PubName: formData.PubName,
       PubAbbrev: formData.PubAbbrev || null,
       IssueSet: formData.IssueSet || null,
-      SubProductTypeId: formData.SubProductTypeId ? parseInt(formData.SubProductTypeId) : null,
-      isActive: formData.isActive
+      SubProductTypeID: formData.SubProductTypeID ? parseInt(formData.SubProductTypeID) : null,
+      IsActive: formData.IsActive
     };
 
     try {
@@ -126,8 +126,8 @@ const Publications = () => {
       PubName: publication.PubName || '',
       PubAbbrev: publication.PubAbbrev || '',
       IssueSet: publication.IssueSet || 0,
-      SubProductTypeId: publication.SubProductTypeId || '',
-      isActive: publication.isActive
+      SubProductTypeID: publication.SubProductTypeID || '',
+      IsActive: publication.IsActive
     });
     setShowForm(true);
   };
@@ -244,8 +244,8 @@ const Publications = () => {
                   <label>Sub Product Type ID</label>
                   <input
                     type="number"
-                    value={formData.SubProductTypeId}
-                    onChange={(e) => setFormData({ ...formData, SubProductTypeId: e.target.value })}
+                    value={formData.SubProductTypeID}
+                    onChange={(e) => setFormData({ ...formData, SubProductTypeID: e.target.value })}
                     placeholder="Enter sub product type ID"
                     min="0"
                   />
@@ -256,8 +256,8 @@ const Publications = () => {
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
-                    checked={formData.isActive}
-                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    checked={formData.IsActive}
+                    onChange={(e) => setFormData({ ...formData, IsActive: e.target.checked })}
                   />
                   <span className="checkbox-custom"></span>
                   Active Publication
@@ -307,8 +307,8 @@ const Publications = () => {
                         <span className="publication-abbrev">({publication.PubAbbrev})</span>
                       )}
                     </div>
-                    <div className={`status-badge ${publication.isActive ? 'active' : 'inactive'}`}>
-                      {publication.isActive ? 'Active' : 'Inactive'}
+                    <div className={`status-badge ${publication.IsActive ? 'active' : 'inactive'}`}>
+                      {publication.IsActive ? 'Active' : 'Inactive'}
                     </div>
                   </div>
 
@@ -324,10 +324,10 @@ const Publications = () => {
                           <span className="detail-value">{publication.IssueSet}</span>
                         </div>
                       )}
-                      {publication.SubProductTypeId && (
+                      {publication.SubProductTypeID && (
                         <div className="detail-item">
                           <span className="detail-label">Type ID:</span>
-                          <span className="detail-value">{publication.SubProductTypeId}</span>
+                          <span className="detail-value">{publication.SubProductTypeID}</span>
                         </div>
                       )}
                     </div>
@@ -351,11 +351,11 @@ const Publications = () => {
                     ✏️ Edit
                   </button>
                   <button
-                    className={`action-btn ${publication.isActive ? 'deactivate-btn' : 'activate-btn'}`}
+                    className={`action-btn ${publication.IsActive ? 'deactivate-btn' : 'activate-btn'}`}
                     onClick={() => handleToggleStatus(publication.gsPublicationID)}
-                    title={publication.isActive ? 'Deactivate publication' : 'Activate publication'}
+                    title={publication.IsActive ? 'Deactivate publication' : 'Activate publication'}
                   >
-                    {publication.isActive ? '⏸️ Deactivate' : '▶️ Activate'}
+                    {publication.IsActive ? '⏸️ Deactivate' : '▶️ Activate'}
                   </button>
                   <button
                     className="action-btn delete-btn"
@@ -406,13 +406,13 @@ const Publications = () => {
                 
                 <div className="view-item">
                   <label>Sub Product Type ID:</label>
-                  <span>{viewingPublication.SubProductTypeId || 'N/A'}</span>
+                  <span>{viewingPublication.SubProductTypeID || 'N/A'}</span>
                 </div>
                 
                 <div className="view-item">
                   <label>Status:</label>
-                  <span className={`status-indicator ${viewingPublication.isActive ? 'active' : 'inactive'}`}>
-                    {viewingPublication.isActive ? 'Active' : 'Inactive'}
+                  <span className={`status-indicator ${viewingPublication.IsActive ? 'active' : 'inactive'}`}>
+                    {viewingPublication.IsActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>

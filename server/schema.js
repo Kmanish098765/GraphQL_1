@@ -23,54 +23,63 @@ const typeDefs = gql`
     Email: String
   }
 
-  # gsPublications Type
+  # gsPublications Type (essential fields only)
   type gsPublications {
     gsPublicationID: Int
     PubName: String
     PubAbbrev: String
     IssueSet: Int
-    SubProductTypeId: Int
-    isActive: Boolean
+    SubProductTypeID: Int
+    IsActive: Boolean
   }
 
-  # Input Types for gsPublications
+  # Input Types for gsPublications (essential fields only)
   input CreateGsPublicationInput {
     PubName: String!
     PubAbbrev: String
     IssueSet: Int
-    SubProductTypeId: Int
-    isActive: Boolean
+    SubProductTypeID: Int
+    IsActive: Boolean
   }
 
   input UpdateGsPublicationInput {
     PubName: String
     PubAbbrev: String
     IssueSet: Int
-    SubProductTypeId: Int
-    isActive: Boolean
+    SubProductTypeID: Int
+    IsActive: Boolean
   }
 
-  # Order Type (UI display name for gsContracts)
+  # Order Type (UI display name for gsContracts - essential fields only)
   type Order {
     OrderId: Int
+    CustomerID: Int
+    Yr: Int
+    Mnth: Int
     PubID: Int
-    DateAdded: String
     Net: Float
+    DateAdded: String
     RepIDs: String
     Description: String
     publication: gsPublications
     representatives: [gsEmployees]
   }
 
-  # Input Types for Orders (gsContracts)
+  # Input Types for Orders (gsContracts - essential fields only)
   input CreateOrderInput {
+    CustomerID: Int!
+    Yr: Int!
+    Mnth: Int!
     PubID: Int!
-    Net: Float!
-    RepIDs: String!
+    Net: Float
+    RepIDs: String
     Description: String
   }
 
   input UpdateOrderInput {
+    CustomerID: Int
+    Yr: Int
+    Mnth: Int
     PubID: Int
     Net: Float
     RepIDs: String
@@ -86,7 +95,7 @@ const typeDefs = gql`
     # gsPublications Queries
     gsPublications: [gsPublications]
     gsPublication(gsPublicationID: Int!): gsPublications
-    gsPublicationsByType(SubProductTypeId: Int!): [gsPublications]
+    gsPublicationsByType(SubProductTypeID: Int!): [gsPublications]
     activeGsPublications: [gsPublications]
 
     # Order Queries (gsContracts backend)

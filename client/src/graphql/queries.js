@@ -25,7 +25,7 @@ export const GET_USER = gql`
   }
 `;
 
-// gsPublications Queries (replacing Product Queries)
+// gsPublications Queries (updated field names)
 export const GET_PUBLICATIONS = gql`
   query GetPublications {
     gsPublications {
@@ -33,8 +33,8 @@ export const GET_PUBLICATIONS = gql`
       PubName
       PubAbbrev
       IssueSet
-      SubProductTypeId
-      isActive
+      SubProductTypeID
+      IsActive
     }
   }
 `;
@@ -46,21 +46,21 @@ export const GET_PUBLICATION = gql`
       PubName
       PubAbbrev
       IssueSet
-      SubProductTypeId
-      isActive
+      SubProductTypeID
+      IsActive
     }
   }
 `;
 
 export const GET_PUBLICATIONS_BY_TYPE = gql`
-  query GetPublicationsByType($SubProductTypeId: Int!) {
-    gsPublicationsByType(SubProductTypeId: $SubProductTypeId) {
+  query GetPublicationsByType($SubProductTypeID: Int!) {
+    gsPublicationsByType(SubProductTypeID: $SubProductTypeID) {
       gsPublicationID
       PubName
       PubAbbrev
       IssueSet
-      SubProductTypeId
-      isActive
+      SubProductTypeID
+      IsActive
     }
   }
 `;
@@ -72,20 +72,23 @@ export const GET_ACTIVE_PUBLICATIONS = gql`
       PubName
       PubAbbrev
       IssueSet
-      SubProductTypeId
-      isActive
+      SubProductTypeID
+      IsActive
     }
   }
 `;
 
-// Order Queries (using gsContracts backend)
+// Order Queries (using gsContracts backend - updated field names)
 export const GET_ORDERS = gql`
   query GetOrders($limit: Int, $offset: Int) {
     orders(limit: $limit, offset: $offset) {
       OrderId
+      CustomerID
+      Yr
+      Mnth
       PubID
-      DateAdded
       Net
+      DateAdded
       RepIDs
       Description
       publication {
@@ -93,8 +96,8 @@ export const GET_ORDERS = gql`
         PubName
         PubAbbrev
         IssueSet
-        SubProductTypeId
-        isActive
+        SubProductTypeID
+        IsActive
       }
       representatives {
         gsEmployeesId
@@ -110,9 +113,12 @@ export const GET_ORDER = gql`
   query GetOrder($OrderId: Int!) {
     order(OrderId: $OrderId) {
       OrderId
+      CustomerID
+      Yr
+      Mnth
       PubID
-      DateAdded
       Net
+      DateAdded
       RepIDs
       Description
       publication {
@@ -120,8 +126,8 @@ export const GET_ORDER = gql`
         PubName
         PubAbbrev
         IssueSet
-        SubProductTypeId
-        isActive
+        SubProductTypeID
+        IsActive
       }
       representatives {
         gsEmployeesId
@@ -137,9 +143,12 @@ export const GET_ORDERS_BY_PUBLICATION = gql`
   query GetOrdersByPublication($PubID: Int!) {
     ordersByPublication(PubID: $PubID) {
       OrderId
+      CustomerID
+      Yr
+      Mnth
       PubID
-      DateAdded
       Net
+      DateAdded
       RepIDs
       Description
       publication {
@@ -161,9 +170,12 @@ export const GET_ORDERS_BY_REPRESENTATIVE = gql`
   query GetOrdersByRepresentative($RepID: Int!) {
     ordersByRepresentative(RepID: $RepID) {
       OrderId
+      CustomerID
+      Yr
+      Mnth
       PubID
-      DateAdded
       Net
+      DateAdded
       RepIDs
       Description
       publication {
@@ -212,7 +224,7 @@ export const DELETE_USER = gql`
   }
 `;
 
-// gsPublications Mutations (replacing Product Mutations)
+// gsPublications Mutations (updated field names)
 export const CREATE_PUBLICATION = gql`
   mutation CreatePublication($input: CreateGsPublicationInput!) {
     createGsPublication(input: $input) {
@@ -220,8 +232,8 @@ export const CREATE_PUBLICATION = gql`
       PubName
       PubAbbrev
       IssueSet
-      SubProductTypeId
-      isActive
+      SubProductTypeID
+      IsActive
     }
   }
 `;
@@ -233,8 +245,8 @@ export const UPDATE_PUBLICATION = gql`
       PubName
       PubAbbrev
       IssueSet
-      SubProductTypeId
-      isActive
+      SubProductTypeID
+      IsActive
     }
   }
 `;
@@ -250,19 +262,22 @@ export const TOGGLE_PUBLICATION_STATUS = gql`
     toggleGsPublicationStatus(gsPublicationID: $gsPublicationID) {
       gsPublicationID
       PubName
-      isActive
+      IsActive
     }
   }
 `;
 
-// Order Mutations (using gsContracts backend)
+// Order Mutations (using gsContracts backend - updated field names)
 export const CREATE_ORDER = gql`
   mutation CreateOrder($input: CreateOrderInput!) {
     createOrder(input: $input) {
       OrderId
+      CustomerID
+      Yr
+      Mnth
       PubID
-      DateAdded
       Net
+      DateAdded
       RepIDs
       Description
       publication {
@@ -283,9 +298,12 @@ export const UPDATE_ORDER = gql`
   mutation UpdateOrder($OrderId: Int!, $input: UpdateOrderInput!) {
     updateOrder(OrderId: $OrderId, input: $input) {
       OrderId
+      CustomerID
+      Yr
+      Mnth
       PubID
-      DateAdded
       Net
+      DateAdded
       RepIDs
       Description
       publication {
