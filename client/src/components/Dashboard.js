@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_USERS, GET_PUBLICATIONS, GET_ORDERS } from '../graphql/queries';
+import CalendarActivities from './CalendarActivities';
 
 const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  
   const { data: usersData, loading: usersLoading } = useQuery(GET_USERS);
   const { data: publicationsData, loading: publicationsLoading } = useQuery(GET_PUBLICATIONS);
   const { data: ordersData, loading: ordersLoading } = useQuery(GET_ORDERS);
@@ -13,17 +16,12 @@ const Dashboard = () => {
 
   const totalUsers = usersData?.gsEmployees?.length || 0;
   const totalPublications = publicationsData?.gsPublications?.length || 0;
-  const activePublications = publicationsData?.gsPublications?.filter(pub => pub.isActive)?.length || 0;
+  const activePublications = publicationsData?.gsPublications?.filter(pub => pub.IsActive)?.length || 0;
   const totalOrders = ordersData?.orders?.length || 0;
   const totalRevenue = ordersData?.orders?.reduce((sum, order) => sum + order.Net, 0) || 0;
 
-  const pendingOrders = ordersData?.orders?.filter(order => order.status === 'pending')?.length || 0;
-  const completedOrders = ordersData?.orders?.filter(order => order.status === 'completed')?.length || 0;
-
-  return (
-    <div className="dashboard">
-      <h2>Dashboard</h2>
-      
+  const renderOverviewTab = () => (
+    <div className="overview-tab">
       <div className="stats-grid">
         <div className="stat-card">
           <h3>Total Users</h3>
@@ -45,16 +43,6 @@ const Dashboard = () => {
           <h3>Total Revenue</h3>
           <p className="stat-number">${totalRevenue?.toFixed(2)}</p>
         </div>
-        
-        {/* <div className="stat-card">
-          <h3>Pending Orders</h3>
-          <p className="stat-number">{pendingOrders}</p>
-        </div>
-        
-        <div className="stat-card">
-          <h3>Completed Orders</h3>
-          <p className="stat-number">{completedOrders}</p>
-        </div> */}
       </div>
 
       <div className="recent-activity">
@@ -66,7 +54,6 @@ const Dashboard = () => {
                 <th>Order ID</th>
                 <th>Customer</th>
                 <th>Total</th>
-                {/* <th>Status</th> */}
                 <th>Date</th>
               </tr>
             </thead>
@@ -76,17 +63,40 @@ const Dashboard = () => {
                   <td>#{order.OrderId}</td>
                   <td>{order.representatives[0]?.FirstName} {order.representatives[0]?.LastName}</td>
                   <td>${order.Net?.toFixed(2)}</td>
-                    {/* <td>
-                        <span className={`status status-${order.status}`}>
-                        {order.status}
-                        </span>
-                  </td> */}
                   <td>{new Date(order.DateAdded).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="dashboard">
+      <h2>Dashboard</h2>
+      
+      {/* Tab Navigation */}
+      <div className="tab-navigation">
+        <button 
+          className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
+          onClick={() => setActiveTab('overview')}
+        >
+          Overview
+        </button>
+        <button 
+          className={`tab-button ${activeTab === 'activities' ? 'active' : ''}`}
+          onClick={() => setActiveTab('activities')}
+        >
+          Calendar Activities
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className="tab-content">
+        {activeTab === 'overview' && renderOverviewTab()}
+        {activeTab === 'activities' && <CalendarActivities />}
       </div>
     </div>
   );

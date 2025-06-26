@@ -86,6 +86,328 @@ const typeDefs = gql`
     Description: String
   }
 
+  # Calendar Activities Schema - Based on context.md specifications
+  
+  # Input Arguments for Calendar Activities
+  input CalendarActivitiesInput {
+    # Activity Type Filters
+    notesCreated: Boolean = false
+    callsMarkedCompleted: Boolean = true
+    callScheduled: Boolean = true
+    createdMeeting: Boolean = false
+    scheduledMeeting: Boolean = false
+    emailDelivered: Boolean = false
+    massEmailDelivered: Boolean = false
+    taskCreated: Boolean = false
+    lettersCreated: Boolean = false
+    mobileCheckInCreated: Boolean = false
+    userLoggedIn: Boolean = false
+    proposalCreated: Boolean = false
+    orderCreated: Boolean = false
+    opportunityCreated: Boolean = false
+    
+    # Date Filters
+    fromDate: String!
+    toDate: String!
+    
+    # User/Customer Filters
+    loggedInUserID: Int!
+    companyName: String
+    name: String
+    customerID: Int
+    contactIDs: String
+    
+    # System Filters
+    isSystem: SystemFilterType = USER_ONLY
+    isNoteRequired: Boolean = false
+  }
+
+  enum SystemFilterType {
+    USER_ONLY
+    SYSTEM_ONLY
+    ALL
+  }
+
+  # Response Types
+  type CalendarActivitiesResponse {
+    activities: [CalendarActivity!]!
+    totalCount: Int!
+  }
+
+  # Union type for different activity types
+  union CalendarActivity = 
+    | NoteActivity 
+    | CallActivity 
+    | MeetingActivity 
+    | EmailActivity 
+    | TaskActivity 
+    | LetterActivity 
+    | MobileCheckInActivity 
+    | UserLoginActivity
+    | ProposalActivity
+    | OrderActivity
+    | OpportunityActivity
+
+  # Base interface for all activities
+  interface BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+  }
+
+  # Specific Activity Types
+  type NoteActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Note-specific fields
+    isPrivate: Boolean!
+    createdBy: Employee!
+  }
+
+  type CallActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Call-specific fields
+    callBack: String
+    isCall: Boolean!
+    isPrivate: Boolean!
+  }
+
+  type MeetingActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Meeting-specific fields
+    meeting: String
+    meetingType: String
+    calendarEventID: String
+    rrule: String
+    duration: Int
+    isPrivate: Boolean!
+  }
+
+  type EmailActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Email-specific fields
+    isEmail: Boolean!
+    isMassEmail: Boolean!
+  }
+
+  type TaskActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Task-specific fields
+    title: String!
+    isPrivate: Boolean!
+    assignedBy: Employee
+  }
+
+  type LetterActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Letter-specific fields
+    isLetter: Boolean!
+  }
+
+  type MobileCheckInActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Mobile check-in specific fields
+    transactionDate: String!
+  }
+
+  type UserLoginActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # User login specific fields
+    loginTime: String!
+    logoutTime: String
+  }
+
+  type ProposalActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Proposal-specific fields
+    proposalName: String!
+    createDate: String!
+  }
+
+  type OrderActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Order-specific fields
+    description: String
+    contractID: ID!
+  }
+
+  type OpportunityActivity implements BaseActivity {
+    id: ID!
+    dateScheduled: String!
+    type: ActivityType!
+    notes: String
+    completed: Int
+    dateCompleted: String
+    assignedTo: Employee
+    customer: Customer
+    permissions: ActivityPermissions!
+    activityCategory: String
+    isSystem: Boolean!
+    
+    # Opportunity-specific fields
+    opportunityName: String!
+    salesPresenter: Employee
+    owner: Employee
+  }
+
+  # Supporting Types for Calendar Activities
+  type Employee {
+    id: ID!
+    firstName: String
+    lastName: String
+    fullName: String
+    isAdmin: Boolean!
+  }
+
+  type Customer {
+    id: ID!
+    customer: String!
+    firstName: String
+    lastName: String
+    parentID: Int
+    isCompany: Boolean!
+  }
+
+  type ActivityPermissions {
+    canEdit: Boolean!
+    canDelete: Boolean!
+    canView: Boolean!
+  }
+
+  enum ActivityType {
+    NOTE
+    CALL
+    CALL_SCHEDULED
+    MEETING
+    MEETING_SCHEDULED
+    EMAIL
+    MASS_EMAIL
+    TASK
+    LETTER
+    MOBILE_CHECK_IN
+    USER_LOGIN
+    PROPOSAL
+    ORDER
+    OPPORTUNITY
+  }
+
   # Queries
   type Query {
     # gsEmployees Queries
@@ -103,6 +425,9 @@ const typeDefs = gql`
     order(OrderId: Int!): Order
     ordersByPublication(PubID: Int!, limit: Int = 100): [Order]
     ordersByRepresentative(RepID: Int!, limit: Int = 100): [Order]
+
+    # Calendar Activities Query
+    getCalendarActivities(input: CalendarActivitiesInput!): CalendarActivitiesResponse!
   }
 
   # Mutations

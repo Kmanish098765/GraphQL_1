@@ -8,7 +8,6 @@ const Users = () => {
   const [formData, setFormData] = useState({ name: '', email: '' });
 
   const { data, loading, error, refetch } = useQuery(GET_USERS);
-  console.log(data);
   const [createUser] = useMutation(CREATE_USER);
   const [updateUser] = useMutation(UPDATE_USER);
   const [deleteUser] = useMutation(DELETE_USER);
